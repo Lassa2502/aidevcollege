@@ -258,7 +258,7 @@ subscription_key = "xxx" # Paste your API key here
 assert subscription_key
 
 # replace <My Endpoint String> with the string from your endpoint URL
-face_api_url = 'https://<My Endpoint String>.cognitiveservices.com/face/v1.0/detect'
+face_api_url = '<My Endpoint String>/face/v1.0/detect'
 
 image_url = 'https://upload.wikimedia.org/wikipedia/commons/3/37/Dagestani_man_and_woman.jpg'
 
@@ -968,14 +968,14 @@ See the Screenshot below:
 
 ![alt text](./images/entity_luis_taged_utterances.png "LUIS Intents")
 
-Hit `Train` to give it a training. Lastly, hit `Publish` and publish it to `Production`. Review the endpoints and copy the endpoint URL (can be found under `Manage` --> `Azure Resources`). It should look something like this:
+Hit `Train` to give it a training. Lastly, hit `Publish` and publish it to `Production`. Review the endpoints and copy the endpoint URL (can be found under **`Manage`** --> **`Azure Resources`**). It should look something like this:
+
+Take **this URL** and **delete** in **YOUR_QUERY_HERE** as shown below. 
 
 ```
-https://westeurope.api.cognitive.microsoft.com/luis/v2.0/apps/<xxxxxx-xxxx-xxFill INxx-xxxx-xxxxxxxx>?subscription-key=<xxxFILL INxxxx>&timezoneOffset=-360&q=
+https://westeurope.api.cognitive.microsoft.com/luis/prediction/v3.0/apps/xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx/slots/production/predict?subscription-key=xxxxxxxxxxxxxxxxxxxxxxxxxxxx&verbose=true&show-all-intents=true&log=true&query=
 ```
-Take **this URL** and **fill in the missing ids** from **your resource**. 
 
-> Copy both Urls into a Notepad to extract the ids.
 
 With a bit of Python, we can now get the intent through the API. <br>
 **Go ahead and copy the code into a new cell in your Notebook:**
@@ -983,9 +983,8 @@ With a bit of Python, we can now get the intent through the API. <br>
 ```python
 import requests, json
 
-# Fill in your ids in this endpoint url 
-# (if you choose your entire url you need to adapt the query parameter as shown below)
-url = "https://westeurope.api.cognitive.microsoft.com/luis/v2.0/apps/<xxxxxx-xxxx-xxFill INxx-xxxx-xxxxxxxx>?subscription-key=<xxxFILL INxxxx>&timezoneOffset=-360&q="
+# Fill in your Endpoint
+url = "<Fill in your Endpoint>"
 
 query = "ich hätte gerne 9 pizza calzone"
 
@@ -999,38 +998,75 @@ The output should look *something* like this:
 
 {
   "query": "ich h\u00e4tte gerne 9 pizza calzone",
-  "topScoringIntent": {
-    "intent": "CreateOrder",
-    "score": 0.4941804
-  },
-  "entities": [
-    {
-      "entity": "calzone",
-      "type": "PizzaType",
-      "startIndex": 24,
-      "endIndex": 30,
-      "score": 0.80077827
+  "prediction": {
+    "topIntent": "CreateOrder",
+    "intents": {
+      "CreateOrder": {
+        "score": 0.4941804
+      },
+      "None": {
+        "score": 0.122900672
+      },
+      "CancelOrder": {
+        "score": 0.045574408
+      }
     },
-    {
-      "entity": "9 pizza calzone",
-      "type": "PizzaOrder",
-      "startIndex": 16,
-      "endIndex": 30,
-      "score": 0.566134334
-    },
-    {
-      "entity": "9",
-      "type": "builtin.number",
-      "startIndex": 16,
-      "endIndex": 16,
-      "resolution": {
-        "subtype": "integer",
-        "value": "9"
+    "entities": {
+      "number": [
+        9
+      ],
+      "PizzaOrder": [
+        "9 pizza calzone"
+      ],
+      "PizzaType": [
+        "calzone"
+      ],
+      "$instance": {
+        "number": [
+          {
+            "type": "builtin.number",
+            "text": "9",
+            "startIndex": 16,
+            "length": 1,
+            "modelTypeId": 2,
+            "modelType": "Prebuilt Entity Extractor",
+            "recognitionSources": [
+              "model"
+            ]
+          }
+        ],
+        "PizzaOrder": [
+          {
+            "type": "PizzaOrder",
+            "text": "9 pizza calzone",
+            "startIndex": 16,
+            "length": 15,
+            "score": 0.566134334,
+            "modelTypeId": 1,
+            "modelType": "Entity Extractor",
+            "recognitionSources": [
+              "model"
+            ]
+          }
+        ],
+        "PizzaType": [
+          {
+            "type": "PizzaType",
+            "text": "calzone",
+            "startIndex": 24,
+            "length": 7,
+            "score": 0.80077827,
+            "modelTypeId": 1,
+            "modelType": "Entity Extractor",
+            "recognitionSources": [
+              "model"
+            ]
+          }
+        ]
       }
     }
-  ]
+  }
 }
-​
 ​
 ```
 
